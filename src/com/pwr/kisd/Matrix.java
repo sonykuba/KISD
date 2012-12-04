@@ -27,6 +27,15 @@ public class Matrix {
 			data[0][i] = codeWord[i];
 	}
 
+	public Matrix(Matrix codeWord) {
+		this.rows = codeWord.getRows();
+		this.columns = codeWord.getCols();
+		data = new boolean[rows][columns];
+		for (int i = 0; i < rows; i++)
+			for (int l = 0; l < columns; l++)
+				data[i][l] = codeWord.get(i, l);
+	}
+
 	public int getRows() {
 		return rows;
 	}
@@ -77,7 +86,7 @@ public class Matrix {
 		for (int i = 0; i < rows; i++) {
 			String temp = "";
 			for (int l = 0; l < columns; l++)
-				temp += data[i][l] + " ";
+				temp += data[i][l] + ", ";
 			System.out.println(temp);
 		}
 	}
@@ -93,10 +102,17 @@ public class Matrix {
 	}
 
 	public void randomize() {
-		for (int i = 0; i < rows; i++)
-			for (int l = 0; l < columns; l++) {
-				data[i][l] = Math.random() > 0.6;
-			}
+		int onesCountPerRow = (int) (rows * 0.5);
+		for (int l = 0; l < columns; l++) {
+			int actualOnesNumber = 0;
+			do {
+				int i = (int) (Math.random() * rows);
+				if (!data[i][l]) {
+					data[i][l] = true;
+					actualOnesNumber++;
+				}
+			} while (onesCountPerRow != actualOnesNumber);
+		}
 	}
 
 	public int getOnesCount(int row) {
@@ -135,7 +151,6 @@ public class Matrix {
 					for (int j = 0; j < data.length; j++) {
 						data[j][data[0].length - 1] = tempColumn[j][0];
 					}
-					setH(rows - zerosAtPosition);
 					zerosAtPosition++;
 				}
 			}
@@ -177,8 +192,8 @@ public class Matrix {
 
 		Matrix toReturn = new Matrix(1, codeWord.getCols() + p1.getCols() + p2.getCols());
 		toReturn.put(codeWord, 0);
-		toReturn.put(p1, codeWord.getCols() - 1);
-		toReturn.put(p2, codeWord.getCols() + p1.getRows() - 1);
+		toReturn.put(p1, codeWord.getCols());
+		toReturn.put(p2, codeWord.getCols() + p1.getCols());
 		return toReturn;
 	}
 
@@ -248,5 +263,13 @@ public class Matrix {
 			if (codeWord.get(0, i) != countedCodeWord.get(0, i))
 				errors++;
 		return errors;
+	}
+
+	public int getOneNumber(int row, int column) {
+		int onesCount = 0;
+		for (int i = 0; i < column; i++)
+			if (data[row][i])
+				onesCount++;
+		return onesCount;
 	}
 }

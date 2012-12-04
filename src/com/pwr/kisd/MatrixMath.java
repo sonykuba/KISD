@@ -31,9 +31,14 @@ public class MatrixMath {
 				return multiply(transpose(A), B);
 		Matrix C = new Matrix(A.getRows(), B.getCols());
 		for (int i = 0; i < C.getRows(); i++)
-			for (int j = 0; j < C.getCols(); j++)
+			for (int j = 0; j < C.getCols(); j++) {
+				boolean out = false;
 				for (int k = 0; k < A.getCols(); k++)
-					C.set(i, j, BooleanProduct(BooleanProduct(B.get(k, j), A.get(i, k)), C.get(i, j)));
+					if (B.get(k, j)) {
+						out = MatrixMath.BooleanProduct(B.get(k, j), A.get(i, k));
+					}
+				C.set(i, j, out);
+			}
 		return C;
 	}
 
@@ -96,7 +101,7 @@ public class MatrixMath {
 	}
 
 	public static boolean BooleanAdd(boolean one, boolean two) {
-		if (!one && two || one && !two)
+		if (one && !two || !one && two)
 			return true;
 		else
 			return false;
@@ -105,14 +110,14 @@ public class MatrixMath {
 	public static Matrix MatrixBooleanSubstract(Matrix a, Matrix b) {
 		for (int i = 0; i < a.getCols(); i++)
 			for (int l = 0; l < a.getRows(); l++)
-				BooleanSubstract(a.get(l, i), b.get(l, i));
+				a.set(l, i, BooleanSubstract(a.get(l, i), b.get(l, i)));
 		return a;
 	}
 
 	public static Matrix MatrixBooleanAdd(Matrix a, Matrix b) {
 		for (int i = 0; i < a.getCols(); i++)
 			for (int l = 0; l < a.getRows(); l++)
-				BooleanAdd(a.get(l, i), b.get(l, i));
+				a.set(l, i, BooleanAdd(a.get(l, i), b.get(l, i)));
 		return a;
 	}
 
@@ -127,14 +132,13 @@ public class MatrixMath {
 				mat.set(i, j, BooleanProduct(BooleanProduct(i % 2 == 0 ? true : false, j % 2 == 0 ? true : false), MatrixMath.determinant(Matrix.createSubMatrix(matrix, i, j))));
 			}
 		}
-	
 		return mat;
 	}
 
 	public static boolean determinant(Matrix matrix) throws Exception {
 		if (matrix.getCols() != matrix.getRows())
 			throw new Exception("matrix need to be square.");
-	
+
 		if (matrix.getRows() == 2) {
 			return BooleanSubstract(BooleanProduct(matrix.get(0, 0), matrix.get(1, 1)), BooleanProduct(matrix.get(0, 1), matrix.get(1, 0)));
 		}
